@@ -1,0 +1,84 @@
+ database agencevoyage;
+use agencevoyage;
+
+create table Voyage (
+NumV int identity (1,1), 
+Paysdestination varchar(30) not null, 
+nbPlaces int not null, 
+lieu_Residence varchar(30) not null, 
+tarif int, 
+datedebut date not null,
+periode int 
+);
+alter table Voyage add  constraint pk_Voyage primary key (NumV);
+alter table Voyage add  constraint uq_Paysdestination unique (Paysdestination);
+alter table Voyage add  constraint uq_lieu_Residence unique (lieu_Residence);
+insert into Voyage values ('Espagne ',18,'Madrid',5000,'18/06/2020',10),
+('Turqie ',20,'Madrid',5000,'18/06/2020',10),
+('Maroc ',25,'Madrid',5000,'18/06/2020',10),
+('France ',30,'Paris',5000,'18/06/2020',10),
+('Inglatera ',15,'london',6000,'20/05/2018',10)
+
+create table Activite (
+IdA int identity (1,1), 
+NumV int, 
+libellé varchar(30), 
+prix money
+);
+alter table Activite add constraint pk_Activite primary key (IdA);
+alter table Activite add constraint fk_Act_Voy foreign key (NumV) references Voyage (NumV) on delete cascade ;
+alter table Activite add constraint ck_Activite check (prix>50);
+
+create table Client (
+idC int identity (1,1),
+nom varchar(30), 
+prénom varchar(30), 
+ville varchar(30),
+région varchar(30),
+solde int 
+);
+drop table Client
+alter table  Client add constraint pk_Client primary key (idC);
+
+create table Séjour_Voyage (
+idC int  ,
+NumV int,
+constraint pkSéjour_Voyage primary key (idC,NumV)
+);
+drop table Séjour_Voyage
+
+
+alter table Séjour_Voyage add constraint sej_Voy foreign key (NumV) references Voyage (NumV) on delete cascade ;
+alter table Séjour_Voyage add constraint sej_cli foreign key (idC) references Client (idC);
+go
+select* from Séjour_Voyage
+ 
+
+
+--Requêtes :
+--1.	Afficher les noms des clients qui ont effectué des voyages dans l’année 2009 vers la Turquie ;
+
+select nom  from Voyage v
+inner join Séjour_Voyage s on v.NumV = s.NumV 
+inner join  Client c on c.idC = s.idC
+where DATEPART(year,datedebut)=2009 and Paysdestination = 'Turquie'
+
+
+
+
+--2.	Afficher les noms des clients qui ont effectué plus de trois voyages organisés ;
+--3.	Quel est le voyage (NumV,PaysDestination) dont le nombre de voyageurs a excédé le nombre de voyageurs du voyage à destination Espagne dans la date 15/09/2010 ;
+--4.	Compter le nombre de places vides pour le voyage à destination ‘Turquie’ dans la date ‘16/07/2011’ ;
+--5.	Pour les clients ayant un solde supérieur à 100.000 afficher les noms à caractère espacé en majuscule ;
+--6.	Calculer le solde moyen puis effectuer un test :
+--Moyenne>20.000 : Il s’agit d’une catégorie haute gamme
+--Sinon : C’est une catégorie moyenne
+--7.	Décrémenter les soldes des clients étant inscrits dans le voyage de code 145 par les tarifs de leur voyages ;
+
+
+
+
+
+
+
+
